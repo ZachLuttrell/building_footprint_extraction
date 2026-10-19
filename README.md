@@ -11,17 +11,18 @@ More information on the training of the model can be found here: [Model Reposito
 ## Features
 
 
-* Upload satellite images (in JPG, PNG, or TIFF format) for processing
+* Upload satellite images (in JPG, PNG, or TIFF/GeoTIFF format) for processing
 * Obtain prediction masks for building footprints via semantic segmentation
-* Option to threshold the predictions and generate overlays with the original image
+* Choose a building probability threshold and generate overlays with the original image
 * Batch processing of multiple images
-* Download options for prediction masks and overlay images
+* Download masks, probability maps and overlays as PNG, plus GeoTIFFs that keep the location of georeferenced uploads
+* Rough estimate of the area covered by buildings for georeferenced uploads
 
 How to run it on your own machine
 ## 1. Clone the repository:
 
-    $ git clone https://github.com/ZachLuttrell/building-footprint-extraction.git
-    $ cd building-footprint-extraction
+    $ git clone https://github.com/ZachLuttrell/building_footprint_extraction.git
+    $ cd building_footprint_extraction
 
 ## 2. Install dependencies
 
@@ -46,12 +47,18 @@ If you want to manually download the model file, you can access it here: [Downlo
 ## Files in the Repository
 
     streamlit_app.py: Main application file for running the Streamlit interface.
+    inference.py: Model loading, tiled prediction and output encoding used by the app.
+    tests/: Checks for inference.py that run without the model (pip install pytest && pytest).
     requirements.txt: List of dependencies required to run the application.
     README.md: This file, containing instructions on how to run the application.
 
 ## Model Information
 
 The model used in this application is a UNet architecture with a VGG16 backbone, specifically trained for building footprint extraction from Sentinel-2 imagery. It includes custom metrics like Dice Coefficient and Jaccard Index, along with a weighted binary cross-entropy loss function to handle class imbalance in the training data.
+
+Because building pixels were weighted about 14 times more than background during training, the model's raw scores run high. The app converts them back into approximate building probabilities, and the threshold slider works on those probabilities.
+
+The model was trained on SpaceNet 7 imagery resampled to Sentinel-2's 10 m resolution, so it works best on RGB imagery at about 10 m per pixel, such as Sentinel-2 true-colour (TCI) images. At that resolution a house covers only a pixel or two, so treat the results as a guide to where buildings are rather than exact outlines.
 
 ## Deployment Instructions
 

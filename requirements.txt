@@ -1,4 +1,6 @@
 gdown
 tensorflow
-streamlit
+streamlit>=1.56
 pillow
+numpy
+rasterio
